@@ -16,7 +16,6 @@ if(df_long[, .N, by = .(.ci, .ri)][N > 1][, .N, ] > 0) {
 }
 
 # Settings
-# output_folder <- ctx$op.value('output_folder', as.character, "Exported data")
 na_encoding <- ctx$op.value('na_encoding', as.numeric, "")
 filename <- ctx$op.value('filename', as.character, "Exported_Table")
 time_stamp <- ctx$op.value('time_stamp', as.logical, FALSE)
@@ -96,7 +95,7 @@ file_to_tercen <- function(file_path, chunk_size_bits = 1e6, filename = NULL) {
 
 }
 
-file_to_tercen(file_path = tmp_file, 1e6, "Exported_Data.csv") %>%
+file_to_tercen(file_path = tmp_file, filename = filename) %>%
   ctx$addNamespace() %>%
   as_relation() %>%
   as_join_operator(list(), list()) %>%
