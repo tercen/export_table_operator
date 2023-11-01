@@ -49,6 +49,16 @@
       ],
       "Hash": "e8a22846fff485f0be3770c2da758713"
     },
+    "base64enc": {
+      "Package": "base64enc",
+      "Version": "0.1-3",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "543776ae6848fde2f48ff3816d0628bc"
+    },
     "cli": {
       "Package": "cli",
       "Version": "3.6.1",
@@ -321,11 +331,12 @@
     },
     "tercen": {
       "Package": "tercen",
-      "Version": "0.13.1",
+      "Version": "0.13.5",
       "Source": "Repository",
       "Repository": "TERCEN",
       "Requirements": [
         "R6",
+        "base64enc",
         "dplyr",
         "httr",
         "mtercen",
@@ -337,7 +348,7 @@
         "uuid",
         "yaml"
       ],
-      "Hash": "3ce0c3eee5ab5d0620770ad364c285f6"
+      "Hash": "f3e7867c738bca726adb6243b2ed45ef"
     },
     "tercenApi": {
       "Package": "tercenApi",
