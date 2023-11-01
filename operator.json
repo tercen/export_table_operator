@@ -1,9 +1,9 @@
 {
-  "name": "Template_R_operator",
-  "description": "Calculate the mathematical average of the data points in a cell.",
-  "tags": ["basic statistics"],
+  "name": "Export CSV",
+  "description": "Export a CSV file based on a crosstab projection.",
+  "tags": ["export"],
   "authors": ["tercen"],
-  "urls": ["https://github.com/tercen/template-R-operator-lite"],
+  "urls": ["https://github.com/tercen/export_csv_operator"],
   "properties": []
 }
 
