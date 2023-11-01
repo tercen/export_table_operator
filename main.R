@@ -82,7 +82,7 @@ file_to_tercen <- function(file_path, chunk_size_bits = 1e6, filename = NULL) {
   )
   
   output_txt <- unlist(
-    x = lapply(X = splitted, FUN = base64enc::base64encode, "txt")
+    x = lapply(X = splitted, FUN = base64enc::base64encode)
   )
   
   df <- tibble::tibble(
