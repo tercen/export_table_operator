@@ -16,8 +16,10 @@ if(df_long[, .N, by = .(.ci, .ri)][N > 1][, .N, ] > 0) {
 }
 
 # Settings
-na_encoding <- ctx$op.value('na_encoding', as.numeric, "")
+format <- ctx$op.value('format', as.character, "CSV")
 filename <- ctx$op.value('filename', as.character, "Exported_Table")
+export_to_project <- ctx$op.value('export_to_project', as.logical, FALSE)
+na_encoding <- ctx$op.value('na_encoding', as.numeric, "")
 time_stamp <- ctx$op.value('time_stamp', as.logical, FALSE)
 decimal_character <- ctx$op.value('decimal_character', as.character, ".")
 data_separator <- ctx$op.value('data_separator', as.character, ",")
@@ -32,11 +34,11 @@ filename <- paste0(filename, ts, ".csv")
 df_wide <- dcast(df_long, .ri ~ .ci, value.var = ".y")
 data <- df_wide[order(.ri)][, !".ri"]
 
-rnames <- ctx$rselect() %>% tidyr::unite(col = "name")
+rnames <- ctx$rselect()
 cnames <- ctx$cselect() %>% tidyr::unite(col = "name")
 
-row.names(data) <- rnames$name
 colnames(data) <- cnames$name
+data <- bind_rows(rnames, data)
 
 # create temp file
 tmp_file = tempfile(fileext = ".csv")
@@ -50,10 +52,15 @@ fwrite(
   sep = data_separator,
   na = na_encoding,
   dec = decimal_character,
-  row.names = TRUE,
+  row.names = FALSE,
   col.names = TRUE,
   verbose = FALSE
 )
+
+if(export_to_project) {
+  source("./utils.R")
+  upload_df(as_tibble(data), ctx, filename = filename, output_folder = "Exported Data")
+}
 
 file_to_tercen(file_path = tmp_file, filename = filename) %>%
   ctx$addNamespace() %>%

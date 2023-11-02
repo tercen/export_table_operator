@@ -1,4 +1,4 @@
-# Export CSV
+# Export Table
 
 ##### Description
 
@@ -14,11 +14,13 @@ Input projection|.
 
 Input parameters|.
 ---|---
-`na_encoding`        | How to encode missing values
-`filename`        | Custom file name
+`format`            | Desired file format
+`filename`          | Custom file name
+`export_to_project` | Whether to upload a copy of the generated file to the project folder.
+`na_encoding`       | How to encode missing values
 `time_stamp`        | Whether to add a time stamp to the file name
-`decimal_character`        | How to encode the decimal symbol
-`data_separator`        | How to encode data separator (default is ",")
+`decimal_character` | How to encode the decimal symbol
+`data_separator`    | How to encode data separator (default is ",")
 
 Output relations|.
 ---|---

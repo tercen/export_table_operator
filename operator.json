@@ -1,10 +1,54 @@
 {
-  "name": "Export CSV",
-  "description": "Export a CSV file based on a crosstab projection.",
+  "name": "Export Table",
+  "description": "Export a data table defined on the crosstab area.",
   "tags": ["export"],
   "authors": ["tercen"],
-  "urls": ["https://github.com/tercen/export_csv_operator"],
-  "properties": []
+  "urls": ["https://github.com/tercen/export_table_operator"],
+  "properties": [
+  {
+    "kind": "EnumeratedProperty",
+    "name": "format",
+    "defaultValue": "CSV",
+    "values": [
+      "CSV"
+    ],
+    "description": "Desired file format."
+  },
+  {
+    "kind": "StringProperty",
+    "name": "filename",
+    "defaultValue": "Exported_Table",
+    "description": "Custom file name."
+  },
+  {
+    "kind": "BooleanProperty",
+    "name": "export_to_project",
+    "defaultValue": false,
+    "description": "Whether to upload a copy of the generated file to the project folder."
+  },
+  {
+    "kind": "StringProperty",
+    "name": "na_encoding",
+    "defaultValue": "",
+    "description": "How to encode missing values."
+  },
+  {
+    "kind": "BooleanProperty",
+    "name": "time_stamp",
+    "defaultValue": false,
+    "description": "Whether to add a time stamp to the file name."
+  },
+  {
+    "kind": "StringProperty",
+    "name": "decimal_character",
+    "defaultValue": ".",
+    "description": "How to encode the decimal symbol."
+  },
+  {
+    "kind": "StringProperty",
+    "name": "data_separator",
+    "defaultValue": ",",
+    "description": "How to encode data separator in CSV files (default is a comma)."
+  }
+  ]
 }
-
-
