@@ -1,3 +1,4 @@
+library(tercenApi)
 upload_df <- function(df, ctx, filename, output_folder) {
   
   # create output folder
@@ -12,7 +13,7 @@ upload_df <- function(df, ctx, filename, output_folder) {
                       type = 'gzip')
   
   fileDoc = FileDocument$new()
-  fileDoc$name = paste0("Export-", filename)
+  fileDoc$name = filename
   fileDoc$projectId = project$id
   fileDoc$acl$owner = project$acl$owner
   fileDoc$metadata$contentEncoding = 'gzip'

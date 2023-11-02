@@ -34,11 +34,11 @@ filename <- paste0(filename, ts, ".csv")
 df_wide <- dcast(df_long, .ri ~ .ci, value.var = ".y")
 data <- df_wide[order(.ri)][, !".ri"]
 
-rnames <- ctx$rselect()
+rnames <- ctx$rselect() %>% as.data.table()
 cnames <- ctx$cselect() %>% tidyr::unite(col = "name")
 
 colnames(data) <- cnames$name
-data <- bind_rows(rnames, data)
+data <- cbind(rnames, data)
 
 # create temp file
 tmp_file = tempfile(fileext = ".csv")

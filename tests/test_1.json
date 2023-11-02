@@ -3,15 +3,15 @@
   "name": "test_1",
   "namespace": "ds0",
   "inputDataUri": "test_1_in.csv",
-  "outputDataUri": ["test_1_out_1.csv"],
+  "outputDataUri": ["test_1_out_1.csv", "test_1_out_2.csv", "test_1_out_3.csv"],
   "columns": [
     "variable"
   ],
-  "rows": ["observation"],
+  "rows": ["observation", "color"],
   "colors": [],
   "labels": [],
   "yAxis": "y_values",
   "xAxis": "",
-  "generatedOn": "11/01/2023 02:07:55 PM 2023",
+  "generatedOn": "11/02/2023 10:29:35 AM 2023",
   "version": ""
 }
