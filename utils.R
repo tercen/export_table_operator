@@ -45,3 +45,38 @@ upload_df <- function(df, ctx, filename, output_folder) {
   
   return(NULL)
 }
+
+
+get_workflow_id <- function(ctx) {
+  if (is.null(ctx$task)) {
+    return(ctx$workflowId)
+  } else {
+    workflowIdPair <-
+      Find(function(pair)
+        identical(pair$key, "workflow.id"),
+        ctx$task$environment)
+    workflowId <- workflowIdPair$value
+    return(workflowId)
+  }
+}
+
+get_step_id <- function(ctx) {
+  if (is.null(ctx$task)) {
+    return(ctx$stepId)
+  } else {
+    stepIdPair <-
+      Find(function(pair)
+        identical(pair$key, "step.id"),
+        ctx$task$environment)
+    stepId <- stepIdPair$value
+    return(stepId)
+  }
+}
+
+get_names <- function(ctx) {
+  wf <- ctx$client$workflowService$get(get_workflow_id(ctx))
+  ds <-
+    Find(function(s)
+      identical(s$id, get_step_id(ctx)), wf$steps)
+  return(list(WF = wf$name, DS = ds$name))
+}

@@ -1,7 +1,7 @@
 {
   "name": "Export Table",
   "description": "Export a data table defined on the crosstab area.",
-  "tags": ["export"],
+  "tags": ["export", "workflow"],
   "authors": ["tercen"],
   "urls": ["https://github.com/tercen/export_table_operator"],
   "properties": [
@@ -17,8 +17,8 @@
   {
     "kind": "StringProperty",
     "name": "filename",
-    "defaultValue": "Exported_Table",
-    "description": "Custom file name."
+    "defaultValue": "Exported_Table_WORKFLOW_DATASTEP",
+    "description": "Custom file name. WORKFLOW and DATASTEP will be replaced by the workflow and data step names, respectively."
   },
   {
     "kind": "BooleanProperty",
