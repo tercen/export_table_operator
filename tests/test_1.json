@@ -14,5 +14,12 @@
   "xAxis": "",
   "generatedOn": "11/02/2023 10:29:35 AM 2023",
   "skipColumns": [".content"],
+  "propertyValues": [
+    {
+    "kind": "PropertyValue",
+    "name": "filename",
+    "value": "Exported_Table"
+    }
+  ],
   "version": ""
 }
