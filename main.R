@@ -32,7 +32,7 @@ if(time_stamp) {
   ts <- ""
 }
 
-if(grep("WORFKLOW|DATASTEP", filename)) {
+if(grepl("WORFKLOW|DATASTEP", filename)) {
   nms <- get_names(ctx)
   filename <- gsub("WORKFLOW", nms$WF, filename)
   filename <- gsub("DATASTEP", nms$DS, filename) 
