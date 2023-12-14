@@ -32,9 +32,12 @@ if(time_stamp) {
   ts <- ""
 }
 
-nms <- get_names(ctx)
-filename <- gsub("WORKFLOW", nms$WF, filename)
-filename <- gsub("DATASTEP", nms$DS, filename)
+if(grep("WORFKLOW|DATASTEP", filename)) {
+  nms <- get_names(ctx)
+  filename <- gsub("WORKFLOW", nms$WF, filename)
+  filename <- gsub("DATASTEP", nms$DS, filename) 
+}
+
 filename <- paste0(filename, ts, ".csv")
 
 df_wide <- dcast(df_long, .ri ~ .ci, value.var = ".y")
