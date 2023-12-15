@@ -15,7 +15,7 @@ Input projection|.
 Input parameters|.
 ---|---
 `format`            | Desired file format
-`filename`          | Custom file name
+`filename`          | Custom file name. WORKFLOW, GROUP and DATASTEP will be replaced by the workflow, group (subworkflow) and data step names, respectively.
 `export_to_project` | Whether to upload a copy of the generated file to the project folder.
 `na_encoding`       | How to encode missing values
 `time_stamp`        | Whether to add a time stamp to the file name

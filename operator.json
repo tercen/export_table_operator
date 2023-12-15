@@ -18,7 +18,7 @@
     "kind": "StringProperty",
     "name": "filename",
     "defaultValue": "Exported_Table_WORKFLOW_DATASTEP",
-    "description": "Custom file name. WORKFLOW and DATASTEP will be replaced by the workflow and data step names, respectively."
+    "description": "Custom file name. WORKFLOW, GROUP and DATASTEP will be replaced by the workflow, group (subworkflow) and data step names, respectively."
   },
   {
     "kind": "BooleanProperty",

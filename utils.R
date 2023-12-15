@@ -78,5 +78,9 @@ get_names <- function(ctx) {
   ds <-
     Find(function(s)
       identical(s$id, get_step_id(ctx)), wf$steps)
-  return(list(WF = wf$name, DS = ds$name))
+  grp <-
+    Find(function(s)
+      identical(s$id, ds$groupId), wf$steps)
+  return(list(WF = wf$name, DS = ds$name, GRP = grp$name))
 }
+

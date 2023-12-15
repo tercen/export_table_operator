@@ -19,7 +19,7 @@ if(df_long[, .N, by = .(.ci, .ri)][N > 1][, .N, ] > 0) {
 
 # Settings
 format <- ctx$op.value('format', as.character, "CSV")
-filename <- ctx$op.value('filename', as.character, "Exported_Table_WORKFLOW_DATASTEP")
+filename <- ctx$op.value('filename', as.character, "Exported_Table_WORKFLOW_GROUP_DATASTEP")
 export_to_project <- ctx$op.value('export_to_project', as.logical, FALSE)
 na_encoding <- ctx$op.value('na_encoding', as.numeric, "")
 time_stamp <- ctx$op.value('time_stamp', as.logical, FALSE)
@@ -32,10 +32,15 @@ if(time_stamp) {
   ts <- ""
 }
 
-if(grepl("WORFKLOW|DATASTEP", filename)) {
+if(grepl("WORFKLOW|GROUP|DATASTEP", filename)) {
   nms <- get_names(ctx)
+  if(!is.null(nms$GRP)) {
+    filename <- gsub("GROUP", nms$GRP, filename)
+  } else {
+    filename <- gsub("GROUP", "", filename)
+  }
   filename <- gsub("WORKFLOW", nms$WF, filename)
-  filename <- gsub("DATASTEP", nms$DS, filename) 
+  filename <- gsub("DATASTEP", nms$DS, filename)
 }
 
 filename <- paste0(filename, ts, ".csv")
