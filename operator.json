@@ -1,6 +1,6 @@
 {
   "name": "Export Table",
-  "description": "Export a data table defined on the crosstab area.",
+  "description": "Exports a data table defined on the crosstab area.",
   "tags": [
     "export"
   ],
