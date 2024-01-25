@@ -1,54 +1,60 @@
 {
   "name": "Export Table",
   "description": "Export a data table defined on the crosstab area.",
-  "tags": ["export", "workflow"],
-  "authors": ["tercen"],
-  "urls": ["https://github.com/tercen/export_table_operator"],
+  "tags": [
+    "export"
+  ],
+  "authors": [
+    "tercen"
+  ],
+  "urls": [
+    "https://github.com/tercen/export_table_operator"
+  ],
   "properties": [
-  {
-    "kind": "EnumeratedProperty",
-    "name": "format",
-    "defaultValue": "CSV",
-    "values": [
-      "CSV"
-    ],
-    "description": "Desired file format."
-  },
-  {
-    "kind": "StringProperty",
-    "name": "filename",
-    "defaultValue": "Exported_Table_WORKFLOW_DATASTEP",
-    "description": "Custom file name. WORKFLOW, GROUP and DATASTEP will be replaced by the workflow, group (subworkflow) and data step names, respectively."
-  },
-  {
-    "kind": "BooleanProperty",
-    "name": "export_to_project",
-    "defaultValue": false,
-    "description": "Whether to upload a copy of the generated file to the project folder."
-  },
-  {
-    "kind": "StringProperty",
-    "name": "na_encoding",
-    "defaultValue": "",
-    "description": "How to encode missing values."
-  },
-  {
-    "kind": "BooleanProperty",
-    "name": "time_stamp",
-    "defaultValue": false,
-    "description": "Whether to add a time stamp to the file name."
-  },
-  {
-    "kind": "StringProperty",
-    "name": "decimal_character",
-    "defaultValue": ".",
-    "description": "How to encode the decimal symbol."
-  },
-  {
-    "kind": "StringProperty",
-    "name": "data_separator",
-    "defaultValue": ",",
-    "description": "How to encode data separator in CSV files (default is a comma)."
-  }
+    {
+      "kind": "EnumeratedProperty",
+      "name": "format",
+      "defaultValue": "CSV",
+      "values": [
+        "CSV"
+      ],
+      "description": "Desired file format."
+    },
+    {
+      "kind": "StringProperty",
+      "name": "filename",
+      "defaultValue": "Exported_Table_WORKFLOW_DATASTEP",
+      "description": "Custom file name. WORKFLOW, GROUP and DATASTEP will be replaced by the workflow, group (subworkflow) and data step names, respectively."
+    },
+    {
+      "kind": "BooleanProperty",
+      "name": "export_to_project",
+      "defaultValue": false,
+      "description": "Whether to upload a copy of the generated file to the project folder."
+    },
+    {
+      "kind": "StringProperty",
+      "name": "na_encoding",
+      "defaultValue": "",
+      "description": "How to encode missing values."
+    },
+    {
+      "kind": "BooleanProperty",
+      "name": "time_stamp",
+      "defaultValue": false,
+      "description": "Whether to add a time stamp to the file name."
+    },
+    {
+      "kind": "StringProperty",
+      "name": "decimal_character",
+      "defaultValue": ".",
+      "description": "How to encode the decimal symbol."
+    },
+    {
+      "kind": "StringProperty",
+      "name": "data_separator",
+      "defaultValue": ",",
+      "description": "How to encode data separator in CSV files (default is a comma)."
+    }
   ]
 }
