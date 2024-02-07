@@ -2,7 +2,7 @@
   "name": "Export Table",
   "description": "Exports a data table defined on the crosstab area.",
   "tags": [
-    "export"
+    "export", "workflow"
   ],
   "authors": [
     "tercen"
