@@ -9,9 +9,6 @@ source("./utils.R")
 
 ctx = tercenCtx()
 
-subfolders <- ctx$client$projectDocumentService$getParentFolders(ctx$workflowId)
-root_path <- paste0("/", paste0(unlist(lapply(subfolders, "[[", "name")), collapse = "/"))
-
 df_long <- ctx$select(c(".ci", ".ri", ".y")) %>%
   as.data.table()
 
@@ -36,8 +33,6 @@ if(!is.null(nms$GRP)) {
 } else {
   filename <- paste(prefix, nms$WF, nms$DS, ts, sep = "_")
 }
-
-filename <- paste0(filename, ".csv")
 
 df_wide <- dcast(df_long, .ri ~ .ci, value.var = ".y")
 data <- df_wide[order(.ri)][, !".ri"]
@@ -66,10 +61,13 @@ fwrite(
 )
 
 if(export_to_project) {
+  subfolders <- ctx$client$projectDocumentService$getParentFolders(ctx$workflowId)
+  if(length(subfolders) == 0) subfolders <- ""
+  root_path <- do.call(file.path, as.list(c(subfolders, "Exported Data")))
   upload_df(as_tibble(data), ctx, filename = filename, output_folder = paste0(root_path, "/Exported Data"))
 }
 
-file_to_tercen(file_path = tmp_file, filename = filename) %>%
+file_to_tercen(file_path = tmp_file, filename = paste0(filename, ".csv")) %>%
   ctx$addNamespace() %>%
   as_relation(relation_name = "CSV Export") %>%
   as_join_operator(list(), list()) %>%

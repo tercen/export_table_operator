@@ -9,22 +9,6 @@
       {
         "Name": "CRAN",
         "URL": "https://cran.tercen.com/api/v1/rlib/CRAN"
-      },
-      {
-        "Name": "BioCsoft",
-        "URL": "https://cran.tercen.com/api/v1/rlib/BioCsoft-3.12"
-      },
-      {
-        "Name": "BioCann",
-        "URL": "https://cran.tercen.com/api/v1/rlib/BioCann-3.12"
-      },
-      {
-        "Name": "BioCexp",
-        "URL": "https://cran.tercen.com/api/v1/rlib/BioCexp-3.12"
-      },
-      {
-        "Name": "BioCworkflows",
-        "URL": "https://cran.tercen.com/api/v1/rlib/BioCworkflows-3.12"
       }
     ]
   },
@@ -343,7 +327,7 @@
     },
     "tercen": {
       "Package": "tercen",
-      "Version": "0.13.6",
+      "Version": "0.13.7",
       "Source": "Repository",
       "Repository": "TERCEN",
       "Requirements": [
@@ -360,7 +344,7 @@
         "uuid",
         "yaml"
       ],
-      "Hash": "022ce1dc981b0079b566579720fff5a5"
+      "Hash": "3f6dca951f308113d8858f12b95e300f"
     },
     "tercenApi": {
       "Package": "tercenApi",
