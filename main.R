@@ -9,6 +9,9 @@ source("./utils.R")
 
 ctx = tercenCtx()
 
+subfolders <- ctx$client$projectDocumentService$getParentFolders(ctx$workflowId)
+root_path <- paste0("/", paste0(unlist(lapply(subfolders, "[[", "name")), collapse = "/"))
+
 df_long <- ctx$select(c(".ci", ".ri", ".y")) %>%
   as.data.table()
 
@@ -19,31 +22,22 @@ if(df_long[, .N, by = .(.ci, .ri)][N > 1][, .N, ] > 0) {
 
 # Settings
 format <- ctx$op.value('format', as.character, "CSV")
-filename <- ctx$op.value('filename', as.character, "Exported_Table_WORKFLOW_GROUP_DATASTEP")
+prefix <- ctx$op.value('filename_prefix', as.character, "Exported_Table")
 export_to_project <- ctx$op.value('export_to_project', as.logical, FALSE)
 na_encoding <- ctx$op.value('na_encoding', as.numeric, "")
-time_stamp <- ctx$op.value('time_stamp', as.logical, FALSE)
 decimal_character <- ctx$op.value('decimal_character', as.character, ".")
 data_separator <- ctx$op.value('data_separator', as.character, ",")
 
-if(time_stamp) {
-  ts <- format(Sys.time(), "-%D-%H:%M:%S")
+ts <- format(Sys.time(), "%Y-%m-%d-%H%M%S")
+
+nms <- get_names(ctx)
+if(!is.null(nms$GRP)) {
+  filename <- paste(prefix, nms$WF, nms$GRP, nms$DS, ts, sep = "_")
 } else {
-  ts <- ""
+  filename <- paste(prefix, nms$WF, nms$DS, ts, sep = "_")
 }
 
-if(grepl("WORFKLOW|GROUP|DATASTEP", filename)) {
-  nms <- get_names(ctx)
-  if(!is.null(nms$GRP)) {
-    filename <- gsub("GROUP", nms$GRP, filename)
-  } else {
-    filename <- gsub("GROUP", "", filename)
-  }
-  filename <- gsub("WORKFLOW", nms$WF, filename)
-  filename <- gsub("DATASTEP", nms$DS, filename)
-}
-
-filename <- paste0(filename, ts, ".csv")
+filename <- paste0(filename, ".csv")
 
 df_wide <- dcast(df_long, .ri ~ .ci, value.var = ".y")
 data <- df_wide[order(.ri)][, !".ri"]
@@ -72,11 +66,11 @@ fwrite(
 )
 
 if(export_to_project) {
-  upload_df(as_tibble(data), ctx, filename = filename, output_folder = "Exported Data")
+  upload_df(as_tibble(data), ctx, filename = filename, output_folder = paste0(root_path, "/Exported Data"))
 }
 
 file_to_tercen(file_path = tmp_file, filename = filename) %>%
   ctx$addNamespace() %>%
-  as_relation() %>%
+  as_relation(relation_name = "CSV Export") %>%
   as_join_operator(list(), list()) %>%
   save_relation(ctx)
