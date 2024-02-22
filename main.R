@@ -27,11 +27,16 @@ data_separator <- ctx$op.value('data_separator', as.character, ",")
 
 ts <- format(Sys.time(), "%Y-%m-%d-%H%M%S")
 
-nms <- get_names(ctx)
-if(!is.null(nms$GRP)) {
-  filename <- paste(prefix, nms$WF, nms$GRP, nms$DS, ts, sep = "_")
+if(is.null(ctx$workflowId)) { # unit test condition
+  filename <- prefix
 } else {
-  filename <- paste(prefix, nms$WF, nms$DS, ts, sep = "_")
+  nms <- get_names(ctx)
+  
+  if(!is.null(nms$GRP)) {
+    filename <- paste(prefix, nms$WF, nms$GRP, nms$DS, ts, sep = "_")
+  } else {
+    filename <- paste(prefix, nms$WF, nms$DS, ts, sep = "_")
+  }
 }
 
 df_wide <- dcast(df_long, .ri ~ .ci, value.var = ".y")
