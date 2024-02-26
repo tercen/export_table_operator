@@ -27,7 +27,8 @@ data_separator <- ctx$op.value('data_separator', as.character, ",")
 
 ts <- format(Sys.time(), "%Y-%m-%d-%H%M%S")
 
-if(is.null(ctx$workflowId)) { # unit test condition
+wfId <- get_workflow_id(ctx)
+if(is.null(wfId)) { # unit test condition
   filename <- prefix
 } else {
   nms <- get_names(ctx)
@@ -66,7 +67,7 @@ fwrite(
 )
 
 if(export_to_project) {
-  subfolders <- ctx$client$projectDocumentService$getParentFolders(ctx$workflowId)
+  subfolders <- ctx$client$projectDocumentService$getParentFolders(wfId)
   if(length(subfolders) == 0) subfolders <- ""
   root_path <- do.call(file.path, as.list(c(subfolders, "Exported Data")))
   upload_df(as_tibble(data), ctx, filename = filename, output_folder = paste0(root_path, "/Exported Data"))
