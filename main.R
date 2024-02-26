@@ -70,7 +70,7 @@ if(export_to_project) {
   subfolders <- ctx$client$projectDocumentService$getParentFolders(wfId)
   if(length(subfolders) == 0) subfolders <- ""
   root_path <- do.call(file.path, as.list(c(subfolders, "Exported Data")))
-  upload_df(as_tibble(data), ctx, filename = filename, output_folder = paste0(root_path, "/Exported Data"))
+  upload_df(as_tibble(data), ctx, filename = filename, output_folder = root_path)
 }
 
 file_to_tercen(file_path = tmp_file, filename = paste0(filename, ".csv")) %>%
