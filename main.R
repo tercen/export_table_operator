@@ -7,8 +7,6 @@ suppressPackageStartupMessages({
 
 source("./utils.R")
 
-ctx = tercenCtx()
-
 df_long <- ctx$select(c(".ci", ".ri", ".y")) %>%
   as.data.table()
 
@@ -67,9 +65,16 @@ fwrite(
 )
 
 if(export_to_project) {
-  subfolders <- ctx$client$projectDocumentService$getParentFolders(wfId)
-  if(length(subfolders) == 0) subfolders <- ""
+  subfolders_list <- ctx$client$projectDocumentService$getParentFolders(wfId)
+  
+  if(length(subfolders) == 0) {
+    subfolders <- ""
+  } else {
+    subfolders <- unlist(lapply(subfolders_list, "[[", "name"))
+  }
+  
   root_path <- do.call(file.path, as.list(c(subfolders, "Exported Data")))
+  
   upload_df(as_tibble(data), ctx, filename = filename, output_folder = root_path)
 }
 
