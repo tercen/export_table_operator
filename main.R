@@ -7,6 +7,8 @@ suppressPackageStartupMessages({
 
 source("./utils.R")
 
+ctx <- tercenCtx()
+
 df_long <- ctx$select(c(".ci", ".ri", ".y")) %>%
   as.data.table()
 
