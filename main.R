@@ -69,7 +69,7 @@ fwrite(
 if(export_to_project) {
   subfolders_list <- ctx$client$projectDocumentService$getParentFolders(wfId)
   
-  if(length(subfolders) == 0) {
+  if(length(subfolders_list) == 0) {
     subfolders <- ""
   } else {
     subfolders <- unlist(lapply(subfolders_list, "[[", "name"))
