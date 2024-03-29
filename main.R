@@ -46,7 +46,12 @@ data <- df_wide[order(.ri)][, !".ri"]
 rnames <- ctx$rselect() %>% as.data.table()
 cnames <- ctx$cselect() %>% tidyr::unite(col = "name")
 
-colnames(data) <- cnames$name
+if((length(ctx$cnames) == 1) & (ctx$cnames[[1]] == "")) {
+  colnames(data) <- ctx$yAxis[[1]]
+} else {
+  colnames(data) <- cnames$name
+}
+
 data <- cbind(rnames, data)
 
 # create temp file
