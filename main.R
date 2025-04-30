@@ -3,6 +3,7 @@ suppressPackageStartupMessages({
   library(data.table)
   library(dplyr, warn.conflicts = FALSE)
   library(tidyr)
+  library(forcats)
 })
 
 source("./utils.R")
@@ -24,7 +25,9 @@ export_to_project <- ctx$op.value('export_to_project', as.logical, FALSE)
 na_encoding <- ctx$op.value('na_encoding', as.numeric, "")
 decimal_character <- ctx$op.value('decimal_character', as.character, ".")
 data_separator <- ctx$op.value('data_separator', as.character, ",")
-
+export_subfolder_name <- ctx$op.value('export_subfolder_name', as.character, "")
+export_subfolder_id <- ctx$op.value('export_subfolder_id', as.character, "")
+if(export_subfolder_id == "") export_subfolder_id <- NULL
 ts <- format(Sys.time(), "%Y-%m-%d-%H%M%S")
 
 wfId <- get_workflow_id(ctx)
@@ -80,9 +83,16 @@ if(export_to_project) {
     subfolders <- unlist(lapply(subfolders_list, "[[", "name"))
   }
   
-  root_path <- do.call(file.path, as.list(c(subfolders, "Exported Data")))
-  
-  upload_df(as_tibble(data), ctx, filename = filename, output_folder = root_path)
+  root_path <- do.call(file.path, as.list(c(subfolders, export_subfolder_name)))
+  data_out <- replace_na_custom(data, new_na = na_encoding)
+
+  upload_df(
+    as_tibble(data_out),
+    ctx,
+    filename = filename,
+    output_folder = root_path,
+    output_folder_id = export_subfolder_id
+  )
 }
 
 file_to_tercen(file_path = tmp_file, filename = paste0(filename, ".csv")) %>%

@@ -1,11 +1,16 @@
 library(tercenApi)
-upload_df <- function(df, ctx, filename, output_folder) {
+upload_df <- function(df, ctx, filename, output_folder, output_folder_id) {
   
   # create output folder
   project   <- ctx$client$projectService$get(ctx$schema$projectId)
   folder    <- NULL
-  if (output_folder != "") {
-    folder  <- ctx$client$folderService$getOrCreate(project$id, output_folder)
+  # if ID specified, get from ID
+  if (!is.null(output_folder_id)) {
+    folder  <- ctx$client$folderService$get(id = output_folder_id)
+  } else {
+    if (output_folder != "") {
+      folder  <- ctx$client$folderService$getOrCreate(project$id, output_folder)
+    }
   }
   
   tbl = tercen::dataframe.as.table(df)
@@ -84,3 +89,37 @@ get_names <- function(ctx) {
   return(list(WF = wf$name, DS = ds$name, GRP = grp$name))
 }
 
+
+replace_na_custom <- function(data, new_na) {
+  # Convert to tibble for consistency
+  data <- as_tibble(data)
+  if(new_na == "") return(data)
+  # Check if new_na is a string-encoded number
+  is_numeric_string <- !is.na(as.numeric(new_na))
+  
+  if (is_numeric_string) {
+    # If new_na is a string-encoded number (e.g., "0", "42"), preserve numeric columns
+    data %>%
+      mutate_if(is.factor, ~fct_explicit_na(., na_level = new_na)) %>%
+      mutate_if(is.numeric, ~replace(., is.na(.), as.numeric(new_na))) %>%
+      mutate_if(is.character, ~replace(., is.na(.), new_na))
+  } else {
+    # If new_na is not a number (e.g., "missing"), convert only columns with NA to character
+    data %>%
+      mutate(across(where(is.factor), ~{
+        if (any(is.na(.))) {
+          as.character(fct_explicit_na(., na_level = new_na))
+        } else {
+          as.character(.)
+        }
+      })) %>%
+      mutate(across(where(is.numeric), ~{
+        if (any(is.na(.))) {
+          as.character(replace(., is.na(.), new_na))
+        } else {
+          .
+        }
+      })) %>%
+      mutate_if(is.character, ~replace(., is.na(.), new_na))
+  }
+}

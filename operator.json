@@ -1,6 +1,7 @@
 {
   "name": "Export Table",
   "description": "Exports a data table defined on the crosstab area.",
+  "container":"ghcr.io/tercen/export_table_operator:1.0.0",
   "tags": [
     "export", "workflow"
   ],
@@ -31,6 +32,18 @@
       "name": "export_to_project",
       "defaultValue": false,
       "description": "Whether to upload a copy of the generated file to the project folder."
+    },
+    {
+      "kind": "StringProperty",
+      "name": "export_subfolder_name",
+      "defaultValue": "",
+      "description": "Name of the export subfolder."
+    },
+    {
+      "kind": "StringProperty",
+      "name": "export_subfolder_id",
+      "defaultValue": "",
+      "description": "ID of the export subfolder. If not empty, subfolder name will be ignored."
     },
     {
       "kind": "StringProperty",
