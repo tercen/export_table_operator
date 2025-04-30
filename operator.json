@@ -1,7 +1,7 @@
 {
   "name": "Export Table",
   "description": "Exports a data table defined on the crosstab area.",
-  "container":"ghcr.io/tercen/export_table_operator:1.0.2",
+  "container":"ghcr.io/tercen/export_table_operator:1.0.3",
   "tags": [
     "export", "workflow"
   ],
