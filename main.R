@@ -22,7 +22,7 @@ if(df_long[, .N, by = .(.ci, .ri)][N > 1][, .N, ] > 0) {
 format <- ctx$op.value('format', as.character, "CSV")
 prefix <- ctx$op.value('filename_prefix', as.character, "Exported_Table")
 export_to_project <- ctx$op.value('export_to_project', as.logical, FALSE)
-na_encoding <- ctx$op.value('na_encoding', as.numeric, "")
+na_encoding <- ctx$op.value('na_encoding', as.character, "")
 decimal_character <- ctx$op.value('decimal_character', as.character, ".")
 data_separator <- ctx$op.value('data_separator', as.character, ",")
 export_subfolder_name <- ctx$op.value('export_subfolder_name', as.character, "")
