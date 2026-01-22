@@ -1,9 +1,10 @@
 {
   "name": "Export Table",
   "description": "Exports a data table defined on the crosstab area.",
-  "container":"ghcr.io/tercen/export_table_operator:1.0.8",
+  "container": "ghcr.io/tercen/export_table_operator:1.0.8",
   "tags": [
-    "export", "workflow"
+    "export",
+    "workflow"
   ],
   "authors": [
     "tercen"
@@ -77,7 +78,7 @@
             "name": "Rows",
             "type": "",
             "description": "Output table rows.",
-            "ontologyMapping": "row",
+            "ontologyMapping": "variable",
             "crosstabMapping": "row",
             "cardinality": "1..n",
             "factors": []
@@ -87,7 +88,7 @@
             "name": "Columns",
             "type": "",
             "description": "Output table columns.",
-            "ontologyMapping": "column",
+            "ontologyMapping": "observation",
             "crosstabMapping": "column",
             "cardinality": "1..n",
             "factors": []
