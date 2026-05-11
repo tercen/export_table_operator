@@ -4,6 +4,7 @@ suppressPackageStartupMessages({
   library(dplyr, warn.conflicts = FALSE)
   library(tidyr)
   library(forcats)
+  library(writexl)
 })
 
 source("./utils.R")
@@ -13,13 +14,14 @@ ctx <- tercenCtx()
 df_long <- ctx$select(c(".ci", ".ri", ".y")) %>%
   as.data.table()
 
-# Checks
 if(df_long[, .N, by = .(.ci, .ri)][N > 1][, .N, ] > 0) {
   stop("Multiple values found in at least a cell.")
 }
 
 # Settings
 format <- ctx$op.value('format', as.character, "CSV")
+collapse_cols <- ctx$op.value('collapse_cols', as.logical, FALSE)
+collapse_rows <- ctx$op.value('collapse_rows', as.logical, FALSE)
 prefix <- ctx$op.value('filename_prefix', as.character, "Exported_Table")
 export_to_project <- ctx$op.value('export_to_project', as.logical, FALSE)
 na_encoding <- ctx$op.value('na_encoding', as.character, "")
@@ -28,14 +30,19 @@ data_separator <- ctx$op.value('data_separator', as.character, ",")
 export_subfolder_name <- ctx$op.value('export_subfolder_name', as.character, "")
 export_subfolder_id <- ctx$op.value('export_subfolder_id', as.character, "")
 if(export_subfolder_id == "") export_subfolder_id <- NULL
-ts <- format(Sys.time(), "%Y-%m-%d-%H%M%S")
 
+format <- toupper(format)
+if (!(format %in% c("CSV", "TSV", "XLSX"))) stop("Unsupported format: ", format)
+ext <- switch(format, CSV = ".csv", TSV = ".tsv", XLSX = ".xlsx")
+# TSV always uses tab; CSV honours data_separator. XLSX is text-format-agnostic.
+text_sep <- if (format == "TSV") "\t" else data_separator
+
+ts <- format(Sys.time(), "%Y-%m-%d-%H%M%S")
 wfId <- get_workflow_id(ctx)
 if(is.null(wfId)) { # unit test condition
   filename <- prefix
 } else {
   nms <- get_names(ctx)
-  
   if(!is.null(nms$GRP)) {
     filename <- paste(prefix, nms$WF, nms$GRP, nms$DS, ts, sep = "_")
   } else {
@@ -44,59 +51,143 @@ if(is.null(wfId)) { # unit test condition
 }
 
 df_wide <- dcast(df_long, .ri ~ .ci, value.var = ".y")
-data <- df_wide[order(.ri)][, !".ri"]
+raw_data <- df_wide[order(.ri)][, !".ri"]
 
-rnames <- ctx$rselect() %>% as.data.table()
-cnames <- ctx$cselect() %>% tidyr::unite(col = "name")
+row_values <- as.data.table(ctx$rselect())
+col_values <- as.data.table(ctx$cselect())
+yaxis_names <- unlist(ctx$yAxis)
+if (length(yaxis_names) == 0) yaxis_names <- ""
+row_names_in <- names(ctx$rnames)
+if (length(row_names_in) == 0) row_names_in <- ""
 
-if((length(ctx$cnames) == 1) & (ctx$cnames[[1]] == "")) {
-  colnames(data) <- ctx$yAxis[[1]]
-} else {
-  colnames(data) <- cnames$name
+no_col_factors <- (length(ctx$cnames) == 1) && (ctx$cnames[[1]] == "")
+no_row_factors <- (ncol(row_values) == 0) ||
+  ((ncol(row_values) == 1) && all(as.character(row_values[[1]]) == ""))
+
+build_collapsed_col_names <- function(col_values, yaxis_names, no_col_factors) {
+  if (no_col_factors) return(yaxis_names[1])
+  if (ncol(col_values) == 1) return(as.character(col_values[[1]]))
+  apply(col_values, 1, paste, collapse = "_")
 }
 
-data <- cbind(rnames, data)
+build_row_block <- function(row_values, row_names_in, collapse_rows, no_row_factors) {
+  if (no_row_factors) {
+    return(list(block = NULL, names = character(0)))
+  }
+  if (collapse_rows && ncol(row_values) >= 1) {
+    joined <- apply(row_values, 1, paste, collapse = "_")
+    joined_name <- paste(row_names_in, collapse = "_")
+    list(
+      block = setNames(data.table(joined), joined_name),
+      names = joined_name
+    )
+  } else {
+    list(block = row_values, names = row_names_in)
+  }
+}
 
-# create temp file
-tmp_file = tempfile(fileext = ".csv")
+row_block <- build_row_block(row_values, row_names_in, collapse_rows, no_row_factors)
+
+# header_block is non-NULL only for crosstab-view output (collapse_cols == FALSE).
+# Each element is a row of cells written verbatim above the data block.
+header_block <- NULL
+
+if (collapse_cols || no_col_factors) {
+  new_col_names <- build_collapsed_col_names(col_values, yaxis_names, no_col_factors)
+  if (is.null(row_block$block)) {
+    df_out <- raw_data
+    colnames(df_out) <- new_col_names
+  } else {
+    df_out <- cbind(row_block$block, raw_data)
+    colnames(df_out) <- c(row_block$names, new_col_names)
+  }
+} else {
+  if (is.null(row_block$block)) {
+    df_out <- raw_data
+  } else {
+    df_out <- cbind(row_block$block, raw_data)
+  }
+  empty_cols <- rep("", max(length(row_block$names) - 1, 0))
+  header_rows <- vector("list", ncol(col_values) + 1)
+  for (i in seq_len(ncol(col_values))) {
+    cf_name <- colnames(col_values)[i]
+    cf_vals <- as.character(col_values[[i]])
+    header_rows[[i]] <- c(empty_cols, cf_name, cf_vals)
+  }
+  yaxis_line <- rep(yaxis_names[1], nrow(col_values))
+  header_rows[[ncol(col_values) + 1]] <- c(empty_cols, "Y-axis", yaxis_line)
+  header_block <- header_rows
+}
+
+tmp_file <- tempfile(fileext = ext)
 on.exit(unlink(tmp_file))
 
-fwrite(
-  data,
-  file = tmp_file,
-  append = FALSE,
-  quote = "auto",
-  sep = data_separator,
-  na = na_encoding,
-  dec = decimal_character,
-  row.names = FALSE,
-  col.names = TRUE,
-  verbose = FALSE
-)
+write_text_output <- function(con, df_out, header_block, sep, na, dec) {
+  if (!is.null(header_block)) {
+    header_text <- paste(
+      vapply(header_block, function(row) paste(row, collapse = sep), character(1)),
+      collapse = "\n"
+    )
+    cat(header_text, "\n", file = con, sep = "")
+    fwrite(
+      df_out, file = con, append = TRUE,
+      quote = "auto", sep = sep, na = na, dec = dec,
+      row.names = FALSE, col.names = FALSE
+    )
+  } else {
+    fwrite(
+      df_out, file = con,
+      quote = "auto", sep = sep, na = na, dec = dec,
+      row.names = FALSE, col.names = TRUE
+    )
+  }
+}
+
+if (format %in% c("CSV", "TSV")) {
+  write_text_output(tmp_file, df_out, header_block, text_sep, na_encoding, decimal_character)
+} else {
+  if (is.null(header_block)) {
+    write_xlsx(as.data.frame(df_out), tmp_file)
+  } else {
+    # Crosstab header rows can't be expressed as a tidy data.frame's colnames, so we
+    # write a TSV first and re-read it without a header row — every cell ends up in
+    # the workbook as-is. Same approach as the Shiny operator.
+    tmp_tsv <- tempfile(fileext = ".tsv")
+    on.exit(unlink(tmp_tsv), add = TRUE)
+    write_text_output(tmp_tsv, df_out, header_block, "\t", na_encoding, decimal_character)
+    xlsx_df <- read.table(tmp_tsv, sep = "\t", header = FALSE,
+                          check.names = FALSE, stringsAsFactors = FALSE,
+                          quote = "\"", comment.char = "", fill = TRUE,
+                          colClasses = "character")
+    write_xlsx(xlsx_df, tmp_file)
+  }
+}
 
 if(export_to_project) {
   subfolders_list <- ctx$client$projectDocumentService$getParentFolders(wfId)
-  
   if(length(subfolders_list) == 0) {
     subfolders <- ""
   } else {
     subfolders <- unlist(lapply(subfolders_list, "[[", "name"))
   }
-  
   root_path <- do.call(file.path, as.list(c(subfolders, export_subfolder_name)))
-  data_out <- replace_na_custom(data, new_na = na_encoding)
 
-  upload_df(
-    as_tibble(data_out),
-    ctx,
-    filename = filename,
-    output_folder = root_path,
-    output_folder_id = export_subfolder_id
-  )
+  if (is.null(header_block)) {
+    data_out <- replace_na_custom(df_out, new_na = na_encoding)
+    upload_df(
+      as_tibble(data_out),
+      ctx,
+      filename = filename,
+      output_folder = root_path,
+      output_folder_id = export_subfolder_id
+    )
+  } else {
+    warning("export_to_project is ignored when collapse_cols = FALSE (multi-row crosstab header cannot be uploaded as a tidy table).")
+  }
 }
 
-file_to_tercen(file_path = tmp_file, filename = paste0(filename, ".csv")) %>%
+file_to_tercen(file_path = tmp_file, filename = paste0(filename, ext)) %>%
   ctx$addNamespace() %>%
-  as_relation(relation_name = "CSV Export") %>%
+  as_relation(relation_name = paste(format, "Export")) %>%
   as_join_operator(list(), list()) %>%
   save_relation(ctx)

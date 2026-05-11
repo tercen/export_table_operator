@@ -19,6 +19,11 @@
     "kind": "PropertyValue",
     "name": "filename",
     "value": "Exported_Table"
+    },
+    {
+    "kind": "PropertyValue",
+    "name": "collapse_cols",
+    "value": "true"
     }
   ],
   "version": ""
