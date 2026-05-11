@@ -1,6 +1,6 @@
 {
   "name": "Export Table",
-  "description": "Exports a data table defined on the crosstab area.",
+  "description": "Exports a data table defined on the crosstab area as CSV, TSV or XLSX.",
   "container": "ghcr.io/tercen/export_table_operator:1.0.8",
   "tags": [
     "export",
@@ -18,9 +18,23 @@
       "name": "format",
       "defaultValue": "CSV",
       "values": [
-        "CSV"
+        "CSV",
+        "TSV",
+        "XLSX"
       ],
       "description": "Desired file format."
+    },
+    {
+      "kind": "BooleanProperty",
+      "name": "collapse_cols",
+      "defaultValue": false,
+      "description": "If true, write a single header row with column factors joined by '_'. If false, write a multi-row crosstab header (one row per column factor plus a Y-axis row)."
+    },
+    {
+      "kind": "BooleanProperty",
+      "name": "collapse_rows",
+      "defaultValue": false,
+      "description": "If true, join all row factors into a single column with values separated by '_'. If false, keep each row factor as its own column."
     },
     {
       "kind": "StringProperty",
@@ -116,7 +130,7 @@
     "outputSpecsV2": [
       {
         "kind": "OperatorJoinSpec",
-        "description": "Export operator - outputs CSV file",
+        "description": "Export operator - outputs CSV, TSV or XLSX file",
         "joinOperators": [
           {
             "kind": "JoinOperator",

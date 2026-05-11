@@ -1421,6 +1421,21 @@
       "Maintainer": "Lionel Henry <lionel@posit.co>",
       "Repository": "RSPM"
     },
+    "writexl": {
+      "Package": "writexl",
+      "Version": "1.5.4",
+      "Source": "Repository",
+      "Type": "Package",
+      "Title": "Export Data Frames to Excel 'xlsx' Format",
+      "License": "BSD_2_clause + file LICENSE",
+      "URL": "https://docs.ropensci.org/writexl/",
+      "BugReports": "https://github.com/ropensci/writexl/issues",
+      "Description": "Zero-dependency data frame to xlsx exporter based on 'libxlsxwriter'. Fast and no Java or Excel required.",
+      "NeedsCompilation": "yes",
+      "Author": "Jeroen Ooms [aut, cre], John McNamara [cph]",
+      "Maintainer": "Jeroen Ooms <jeroenooms@gmail.com>",
+      "Repository": "CRAN"
+    },
     "yaml": {
       "Package": "yaml",
       "Version": "2.3.10",
