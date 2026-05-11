@@ -1,4 +1,6 @@
 FROM tercen/runtime-r44-minimal:4.4.3-2 AS build
+RUN installr -d dplyr
+RUN installr -d tidyr
 RUN installr -d data.table
 RUN installr -d forcats
 RUN installr -d writexl
