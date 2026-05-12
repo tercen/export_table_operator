@@ -166,11 +166,22 @@ if (format %in% c("CSV", "TSV")) {
 if(export_to_project) {
   subfolders_list <- ctx$client$projectDocumentService$getParentFolders(wfId)
   if(length(subfolders_list) == 0) {
-    subfolders <- ""
+    subfolders <- character(0)
   } else {
     subfolders <- unlist(lapply(subfolders_list, "[[", "name"))
   }
-  root_path <- do.call(file.path, as.list(c(subfolders, export_subfolder_name)))
+  # When no folder picker id and no subfolder name, default to "Exported Data"
+  # so getOrCreate has a non-empty terminal segment (matches pre-1.0.0 behavior).
+  effective_subfolder_name <- if (nzchar(export_subfolder_name)) {
+    export_subfolder_name
+  } else if (is.null(export_subfolder_id)) {
+    "Exported Data"
+  } else {
+    ""
+  }
+  path_parts <- c(subfolders, effective_subfolder_name)
+  path_parts <- path_parts[nzchar(path_parts)]
+  root_path <- if (length(path_parts) == 0) "" else do.call(file.path, as.list(path_parts))
 
   if (is.null(header_block)) {
     data_out <- replace_na_custom(df_out, new_na = na_encoding)
