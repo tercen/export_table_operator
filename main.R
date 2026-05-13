@@ -183,18 +183,13 @@ if(export_to_project) {
   path_parts <- path_parts[nzchar(path_parts)]
   root_path <- if (length(path_parts) == 0) "" else do.call(file.path, as.list(path_parts))
 
-  if (is.null(header_block)) {
-    data_out <- replace_na_custom(df_out, new_na = na_encoding)
-    upload_df(
-      as_tibble(data_out),
-      ctx,
-      filename = filename,
-      output_folder = root_path,
-      output_folder_id = export_subfolder_id
-    )
-  } else {
-    warning("export_to_project is ignored when collapse_cols = FALSE (multi-row crosstab header cannot be uploaded as a tidy table).")
-  }
+  upload_file_to_folder(
+    file_path = tmp_file,
+    ctx = ctx,
+    filename = paste0(filename, ext),
+    output_folder = root_path,
+    output_folder_id = export_subfolder_id
+  )
 }
 
 file_to_tercen(file_path = tmp_file, filename = paste0(filename, ext)) %>%
