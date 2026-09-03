@@ -50,11 +50,21 @@ if(is.null(wfId)) { # unit test condition
   }
 }
 
-df_wide <- dcast(df_long, .ri ~ .ci, value.var = ".y")
-raw_data <- df_wide[order(.ri)][, !".ri"]
-
 row_values <- as.data.table(ctx$rselect())
 col_values <- as.data.table(ctx$cselect())
+
+# dcast only emits a row/column per .ri/.ci value that actually occurs, so a crosstab
+# row or column holding no observations at all would silently drop out and leave the
+# data block smaller than the headers built from rselect()/cselect() - which then fails
+# in colnames<- ("Can't assign N names to an M-column data.table"). Pin the levels to
+# the full index range and keep the empty ones so the block always lines up.
+n_ri <- max(nrow(row_values), max(df_long$.ri) + 1L)
+n_ci <- max(nrow(col_values), max(df_long$.ci) + 1L)
+df_long[, .ri := factor(.ri, levels = seq_len(n_ri) - 1L)]
+df_long[, .ci := factor(.ci, levels = seq_len(n_ci) - 1L)]
+
+df_wide <- dcast(df_long, .ri ~ .ci, value.var = ".y", drop = FALSE)
+raw_data <- df_wide[order(.ri)][, !".ri"]
 yaxis_names <- unlist(ctx$yAxis)
 if (length(yaxis_names) == 0) yaxis_names <- ""
 row_names_in <- names(ctx$rnames)
