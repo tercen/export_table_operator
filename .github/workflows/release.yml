@@ -24,10 +24,27 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Update container in operator JSON
+        with:
+          fetch-depth: 0
+      # Tercen resolves the tag-less `container` in operator.json by appending the SHA it
+      # parses out of the GitHub zipball directory name (`<org>-<repo>-<short-sha>/`), so
+      # the image must carry that exact tag. That name uses the sha of the *ref object*,
+      # which for an ANNOTATED tag is the tag object, not the commit — e.g. 1.1.0 resolves
+      # to 4be5a84, while the commit is 65938db. Peeling with HEAD^{commit} is therefore
+      # not sufficient on its own, so publish both shas (short and full). Lightweight tags
+      # remain the preferred convention, where the two are identical.
+      #
+      # The old "patch operator.json in the runner" step was dead code: Tercen reads
+      # operator.json from the git checkout at the installed ref, never from the built
+      # image or the runner workspace.
+      - name: Resolve commit SHA
+        id: commit
         run: |
-          jq --arg variable "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${GITHUB_REF##*/}" '.container = $variable' operator.json > operator.json.tmp
-          mv operator.json.tmp operator.json
+          set -euo pipefail
+          echo "sha=$(git rev-parse "${GITHUB_REF}^{commit}")" >> "$GITHUB_OUTPUT"
+          echo "sha_short=$(git rev-parse --short=7 "${GITHUB_REF}^{commit}")" >> "$GITHUB_OUTPUT"
+          echo "ref_sha=$(git rev-parse "${GITHUB_REF}")" >> "$GITHUB_OUTPUT"
+          echo "ref_sha_short=$(git rev-parse --short=7 "${GITHUB_REF}")" >> "$GITHUB_OUTPUT"
       # Uses the `docker/login-action` action to log in to the Container registry registry using the account and password that will publish the packages. Once published, the packages are scoped to the account defined here.
       - name: Log in to the Container registry
         uses: docker/login-action@v3.3.0
@@ -41,9 +58,15 @@ jobs:
         uses: docker/metadata-action@v5.5.1
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          # Semver tag for humans, plus every sha the installed ref can resolve to
+          # (immutable) for Tercen's tag-less container resolution. When the tag is
+          # lightweight, ref_sha == sha and the duplicates collapse.
           tags: |
-            # minimal
             type=pep440,pattern={{version}}
+            type=raw,value=${{ steps.commit.outputs.sha }}
+            type=raw,value=${{ steps.commit.outputs.sha_short }}
+            type=raw,value=${{ steps.commit.outputs.ref_sha }}
+            type=raw,value=${{ steps.commit.outputs.ref_sha_short }}
       # This step uses the `docker/build-push-action` action to build the image, based on your repository's `Dockerfile`. If the build succeeds, it pushes the image to GitHub Packages.
       # It uses the `context` parameter to define the build's context as the set of files located in the specified path. For more information, see "[Usage](https://github.com/docker/build-push-action#usage)" in the README of the `docker/build-push-action` repository.
       # It uses the `tags` and `labels` parameters to tag and label the image with the output from the "meta" step.
